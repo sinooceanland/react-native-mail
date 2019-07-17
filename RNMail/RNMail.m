@@ -82,7 +82,7 @@ RCT_EXPORT_METHOD(mail:(NSDictionary *)options
             NSData *fileData = [NSData dataWithContentsOfFile:attachmentPath];
 
             // Determine the MIME type
-            NSString *mimeType;
+            NSString *mimeType = attachmentType ?: @"";
 
             /*
              * Add additional mime types and PR if necessary. Find the list
