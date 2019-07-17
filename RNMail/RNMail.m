@@ -88,7 +88,7 @@ RCT_EXPORT_METHOD(mail:(NSDictionary *)options
              * Add additional mime types and PR if necessary. Find the list
              * of supported formats at http://www.iana.org/assignments/media-types/media-types.xhtml
              */
-            if ([attachmentType isEqualToString:@"jpg"]) {
+            if ([attachmentType isEqualToString:@"jpg"] || [attachmentType isEqualToString:@"jpeg"]) {
                 mimeType = @"image/jpeg";
             } else if ([attachmentType isEqualToString:@"png"]) {
                 mimeType = @"image/png";
