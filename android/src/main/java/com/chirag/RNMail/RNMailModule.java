@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.text.Html;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -53,7 +55,7 @@ public class RNMailModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void mail(ReadableMap options, Callback callback) {
-    Intent i = new Intent(Intent.ACTION_SENDTO);
+    Intent i = new Intent(Intent.ACTION_SEND);
     i.setData(Uri.parse("mailto:"));
 
     if (options.hasKey("subject") && !options.isNull("subject")) {
@@ -89,8 +91,14 @@ public class RNMailModule extends ReactContextBaseJavaModule {
       if (attachment.hasKey("path") && !attachment.isNull("path")) {
         String path = attachment.getString("path");
         File file = new File(path);
-        Uri p = Uri.fromFile(file);
-        i.putExtra(Intent.EXTRA_STREAM, p);
+        Uri uri;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+          uri = Uri.fromFile(file);
+        } else {
+          uri = FileProvider.getUriForFile(getCurrentActivity(), getReactApplicationContext().getPackageName() + ".provider", file);
+        }
+        i.setType("application/octet-stream");
+        i.putExtra(Intent.EXTRA_STREAM, uri);
       }
     }
 
@@ -110,11 +118,11 @@ public class RNMailModule extends ReactContextBaseJavaModule {
         callback.invoke("error");
       }
     } else {
-      Intent chooser = Intent.createChooser(i, "Send Mail");
-      chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//      Intent chooser = Intent.createChooser(i, "Send Mail");
+//      chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
       try {
-        reactContext.startActivity(chooser);
+        reactContext.startActivity(i);
       } catch (Exception ex) {
         callback.invoke("error");
       }
